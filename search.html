@@ -1,1 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Search — TheEuroBrief</title>
+  <meta name="description" content="Search European news articles on TheEuroBrief.">
+  <meta name="robots" content="noindex, follow">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='15' fill='%23B91C1C'/><text x='50' y='68' font-family='serif' font-size='55' font-weight='bold' fill='white' text-anchor='middle'>E</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Source+Sans+3:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: { extend: { colors: { brand: { 50:'#fef2f2',100:'#fee2e2',200:'#fecaca',500:'#B91C1C',600:'#991B1B',700:'#7F1D1D' }, navy: { 50:'#f0f4f8',100:'#d9e2ec',200:'#bcccdc',300:'#9fb3c8',400:'#829ab1',500:'#627d98',600:'#486581',700:'#334e68',800:'#243b53',900:'#102a43' } }, fontFamily: { display: ['"Playfair Display"','Georgia','serif'], body: ['"Source Sans 3"','Helvetica','sans-serif'] } } }
+    }
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+  <style>
+    body { font-family: 'Source Sans 3', sans-serif; }
+    .font-display { font-family: 'Playfair Display', Georgia, serif; }
+    .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .line-clamp-3 { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+    .nav-link { position: relative; }
+    .nav-link::after { content: ''; position: absolute; bottom: -2px; left: 0; width: 0; height: 2px; background: #B91C1C; transition: width 0.3s ease; }
+    .nav-link:hover::after { width: 100%; }
+  </style>
+</head>
+<body class="bg-gray-50 text-navy-900 font-body antialiased">
 
+  <!-- TOP BAR -->
+  <div class="bg-navy-900 text-white text-xs">
+    <div class="max-w-7xl mx-auto px-4 py-2 flex items-center justify-between">
+      <span id="current-date" class="hidden sm:block"></span>
+      <div class="flex items-center gap-4">
+        <a href="about.html" class="hover:text-brand-100 transition-colors">About</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- HEADER -->
+  <header class="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+      <a href="index.html" class="flex items-center gap-2">
+        <div class="w-10 h-10 bg-brand-500 rounded-lg flex items-center justify-center"><span class="text-white font-display font-black text-xl">E</span></div>
+        <div>
+          <h1 class="font-display font-black text-2xl md:text-3xl text-navy-900 leading-none tracking-tight">TheEuroBrief</h1>
+          <span class="text-[10px] uppercase tracking-[0.25em] text-navy-500 font-semibold hidden sm:block">Your Window into Europe</span>
+        </div>
+      </a>
+      <button id="mobile-menu-btn" class="md:hidden p-2 rounded-lg hover:bg-gray-100 transition"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+    </div>
+    <nav class="border-t border-gray-100 bg-gray-50/80 hidden md:block">
+      <div class="max-w-7xl mx-auto px-4">
+        <div id="nav-categories" class="flex items-center gap-1 overflow-x-auto py-0 scrollbar-hide text-sm">
+          <a href="index.html" class="nav-link px-3 py-3 font-medium text-navy-600 hover:text-brand-500 whitespace-nowrap transition-colors">Home</a>
+        </div>
+      </div>
+    </nav>
+    <div id="mobile-menu" class="md:hidden hidden border-t border-gray-100 bg-white">
+      <div class="px-4 py-3"><div id="mobile-nav-categories" class="flex flex-col gap-1"><a href="index.html" class="px-3 py-2 rounded-lg font-medium text-navy-600 hover:bg-gray-100">Home</a></div></div>
+    </div>
+  </header>
+
+  <!-- MAIN -->
+  <main class="max-w-4xl mx-auto px-4 py-10">
+    <nav class="flex items-center gap-2 text-xs text-navy-400 mb-6">
+      <a href="index.html" class="hover:text-brand-500 transition-colors">Home</a><span class="text-navy-300">/</span><span class="text-navy-700 font-medium">Search</span>
+    </nav>
+
+    <h1 class="font-display font-black text-4xl text-navy-900 mb-6">Search Articles</h1>
+
+    <form id="search-form" class="relative mb-8">
+      <input type="text" id="search-input" placeholder="What are you looking for?" autofocus
+        class="w-full pl-12 pr-28 py-4 text-lg border border-gray-300 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-brand-500/30 focus:border-brand-500 transition shadow-sm">
+      <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+      <button type="submit" class="absolute right-2 top-1/2 -translate-y-1/2 px-5 py-2.5 bg-brand-500 text-white text-sm font-semibold rounded-lg hover:bg-brand-600 transition-colors">Search</button>
+    </form>
+
+    <div id="search-results" class="space-y-4">
+      <div class="text-center py-12 text-navy-400">
+        <svg class="w-16 h-16 mx-auto mb-3 text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+        <p class="font-display text-lg">Type a keyword and press search</p>
+      </div>
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="bg-navy-900 text-white">
+    <div class="max-w-7xl mx-auto px-4 py-8 text-center text-xs text-navy-400">
+      <span>&copy; <span id="footer-year"></span> TheEuroBrief. All rights reserved.</span>
+    </div>
+  </footer>
+
+  <script>
+  (function() {
+    'use strict';
+    document.getElementById('current-date').textContent = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    document.getElementById('footer-year').textContent = new Date().getFullYear();
+    const menuBtn = document.getElementById('mobile-menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    if (menuBtn && mobileMenu) menuBtn.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
+
+    async function loadNav() {
+      const { data } = await supabaseClient.from('categories').select('*').order('name');
+      if (!data) return;
+      document.getElementById('nav-categories').innerHTML = `<a href="index.html" class="nav-link px-3 py-3 font-medium text-navy-600 hover:text-brand-500 whitespace-nowrap transition-colors">Home</a>` + data.map(c => `<a href="category.html?slug=${c.slug}" class="nav-link px-3 py-3 text-navy-600 hover:text-brand-500 font-medium whitespace-nowrap transition-colors">${c.name}</a>`).join('');
+      document.getElementById('mobile-nav-categories').innerHTML = `<a href="index.html" class="px-3 py-2 rounded-lg font-medium text-navy-600 hover:bg-gray-100">Home</a>` + data.map(c => `<a href="category.html?slug=${c.slug}" class="px-3 py-2 rounded-lg font-medium text-navy-600 hover:bg-gray-100">${c.name}</a>`).join('');
+    }
+    loadNav();
+
+    const searchInput = document.getElementById('search-input');
+    const searchResults = document.getElementById('search-results');
+    const params = new URLSearchParams(window.location.search);
+    const initialQuery = params.get('q');
+    if (initialQuery) { searchInput.value = initialQuery; performSearch(initialQuery); }
+
+    document.getElementById('search-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const q = searchInput.value.trim();
+      if (q) { window.history.replaceState(null, '', `?q=${encodeURIComponent(q)}`); performSearch(q); }
+    });
+
+    async function performSearch(query) {
+      searchResults.innerHTML = '<div class="text-center py-8"><div class="w-8 h-8 border-2 border-brand-500 border-t-transparent rounded-full animate-spin mx-auto"></div><p class="text-navy-400 mt-3 text-sm">Searching...</p></div>';
+
+      const { data, error } = await supabaseClient
+        .from('articles')
+        .select('*, categories(*)')
+        .eq('is_published', true)
+        .or(`title.ilike.%${query}%,content.ilike.%${query}%,excerpt.ilike.%${query}%`)
+        .order('published_at', { ascending: false })
+        .limit(20);
+
+      if (error || !data || data.length === 0) {
+        searchResults.innerHTML = `<div class="text-center py-12"><div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3"><svg class="w-8 h-8 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div><p class="font-display text-xl text-navy-900">No results found</p><p class="text-navy-400 mt-1">Try different keywords</p></div>`;
+        return;
+      }
+
+      document.title = `"${query}" — Search Results — TheEuroBrief`;
+      searchResults.innerHTML = `<p class="text-sm text-navy-500 mb-2">${data.length} result${data.length > 1 ? 's' : ''} for "<strong class="text-navy-800">${query}</strong>"</p>` +
+        data.map(a => {
+          const catName = a.categories?.name || 'News';
+          const catSlug = a.categories?.slug || 'all';
+          return `<a href="article.html?slug=${a.slug}" class="group block bg-white rounded-xl p-5 border border-gray-100 hover:border-brand-200 hover:shadow-md transition-all duration-300">
+            <span class="text-xs font-bold text-brand-500 uppercase tracking-wider">${catName}</span>
+            <h3 class="mt-1 font-display font-bold text-lg text-navy-900 group-hover:text-brand-600 transition-colors line-clamp-2">${a.title}</h3>
+            <p class="mt-1 text-sm text-navy-500 line-clamp-2">${a.excerpt || ''}</p>
+            <p class="mt-2 text-xs text-navy-400">${formatDateShort(a.published_at)}</p>
+          </a>`;
+        }).join('');
+    }
+  })();
+  </script>
+</body>
+</html>
