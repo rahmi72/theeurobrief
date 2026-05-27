@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>New Article — TheEuroBrief Admin</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='15' fill='%23B91C1C'/><text x='50' y='68' font-family='serif' font-size='55' font-weight='bold' fill='white' text-anchor='middle'>E</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Source+Sans+3:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Quill Editor CSS -->
+  <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: { extend: { colors: { brand: { 50:'#fef2f2',100:'#fee2e2',500:'#B91C1C',600:'#991B1C' }, navy: { 400:'#829ab1',500:'#627d98',600:'#486581',700:'#334e68',800:'#243b53',900:'#102a43' } }, fontFamily: { display: ['"Playfair Display"','Georgia','serif'], body: ['"Source Sans 3"','sans-serif'] } } }
+    }
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../js/config.js"></script>
+  <script src="js/admin-auth.js"></script>
+  <style>
+    body { font-family: 'Source Sans 3', sans-serif; }
+    .font-display { font-family: 'Playfair Display', Georgia, serif; }
+    @keyframes slideIn { from { transform: translateY(-10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+    /* Quill overrides */
+    .ql-toolbar.ql-snow { border: 1px solid #d1d5db; border-radius: 0.5rem 0.5rem 0 0; background: #f9fafb; }
+    .ql-container.ql-snow { border: 1px solid #d1d5db; border-top: none; border-radius: 0 0 0.5rem 0.5rem; font-family: 'Source Sans 3', sans-serif; font-size: 1rem; min-height: 300px; }
+    .ql-editor { min-height: 300px; padding: 1rem; line-height: 1.7; }
+    .ql-editor h1 { font-size: 1.75rem; font-weight: 700; margin: 0.5em 0; }
+    .ql-editor h2 { font-size: 1.5rem; font-weight: 700; margin: 0.5em 0; }
+    .ql-editor h3 { font-size: 1.25rem; font-weight: 700; margin: 0.5em 0; }
+    .ql-editor blockquote { border-left: 4px solid #B91C1C; padding-left: 1em; color: #486581; }
+    .ql-editor img { max-width: 100%; border-radius: 0.5rem; margin: 1em 0; }
+
+    /* Image upload area */
+    .upload-zone { border: 2px dashed #d1d5db; border-radius: 0.5rem; transition: all 0.2s; }
+    .upload-zone:hover, .upload-zone.dragover { border-color: #B91C1C; background: #fef2f2; }
+  </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+
+  <!-- TOP NAV -->
+  <nav class="bg-navy-900 text-white sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 h-14 flex items-center justify-between">
+      <div class="flex items-center gap-5">
+        <a href="dashboard.html" class="flex items-center gap-2">
+          <div class="w-8 h-8 bg-brand-500 rounded-lg flex items-center justify-center">
+            <span class="text-white font-display font-black text-sm">E</span>
+          </div>
+          <span class="font-display font-bold hidden sm:inline">Admin</span>
+        </a>
+        <div class="flex items-center gap-1 text-sm">
+          <a href="dashboard.html" class="px-3 py-1.5 rounded hover:bg-white/10 transition-colors">Dashboard</a>
+          <a href="article-edit.html" class="px-3 py-1.5 rounded bg-white/10 font-medium">+ New Article</a>
+        </div>
+      </div>
+      <div class="flex items-center gap-4">
+        <span id="admin-email" class="text-xs text-navy-400 hidden sm:inline"></span>
+        <button onclick="logout()" class="text-xs text-navy-400 hover:text-white transition-colors">Logout</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- MAIN -->
+  <main class="max-w-4xl mx-auto px-4 py-6">
+
+    <!-- Header -->
+    <div class="flex items-center justify-between mb-6">
+      <h1 id="page-title" class="font-display font-bold text-2xl text-navy-900">New Article</h1>
+      <div class="flex items-center gap-2">
+        <button onclick="saveArticle(false)" id="btn-draft" class="px-4 py-2 bg-white border border-gray-300 text-navy-700 text-sm font-semibold rounded-lg hover:bg-gray-50 transition-colors">
+          Save Draft
+        </button>
+        <button onclick="saveArticle(true)" id="btn-publish" class="px-4 py-2 bg-brand-500 text-white text-sm font-semibold rounded-lg hover:bg-brand-600 transition-colors">
+          Publish
+        </button>
+      </div>
+    </div>
+
+    <form id="article-form" class="space-y-6" onsubmit="return false;">
+
+      <!-- Title -->
+      <div class="bg-white rounded-xl border border-gray-200 p-5">
+        <label class="block text-sm font-semibold text-navy-800 mb-2">Article Title <span class="text-red-500">*</span></label>
+        <input type="text" id="input-title" required placeholder="Enter article title..."
+          class="w-full px-4 py-3 text-lg border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500/30 focus:border-brand-500 transition font-display">
+        <div class="flex items-center gap-3 mt-2">
+          <label class="text-xs text-navy-500">Slug:</label>
+          <span id="slug-display" class="text-xs text-navy-400 font-mono">auto-generated-from-title</span>
+          <button type="button" onclick="toggleSlugEdit()" id="slug-edit-btn" class="text-xs text-brand-500 hover:text-brand-600 font-semibold">Edit</button>
+        </div>
+        <input type="text" id="input-slug" class="hidden w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500/30 focus:border-brand-500 transition font-mono mt-2" placeholder="article-slug">
+      </div>
+
+      <!-- Category + Featured -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div class="bg-white rounded-xl border border-gray-200 p-5">
+          <label class="block text-sm font-semibold text-navy-800 mb-2">Category <span class="text-red-500">*</span></label>
+          <select id="input-category" required
+            class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500/30 focus:border-brand-500 transition text-sm bg-white">
+            <option value="">Select category...</option>
+          </select>
+        </div>
+        <div class="bg-white rounded-xl border border-gray-200 p-5">
+          <label class="block text-sm font-semibold text-navy-800 mb-2">Options</label>
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="checkbox" id="input-featured" class="w-4 h-4 text-brand-500 rounded border-gray-300 focus:ring-brand-500">
+            <span class="text-sm text-navy-700">Mark as featured article</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Featured Image -->
+      <div class="bg-white rounded-xl border border-gray-200 p-5">
+        <label class="block text-sm font-semibold text-navy-800 mb-3">Featured Image</label>
+
+        <!-- Preview -->
+        <div id="image-preview" class="hidden mb-4 relative">
+          <img id="image-preview-img" src="" alt="Preview" class="w-full max-h-64 object-cover rounded-lg">
+          <button type="button" onclick="removeImage()" class="absolute top-2 right-2 w-8 h-8 bg-red-600 text-white rounded-full flex items-center justify-center hover:bg-red-700 transition-colors text-sm font-bold shadow-lg">&times;</button>
+        </div>
+
+        <!-- Upload Zone -->
+        <div id="upload-zone" class="upload-zone p-6 text-center cursor-pointer" onclick="document.getElementById('file-input').click()">
+          <svg class="w-10 h-10 mx-auto text-gray-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+          <p class="text-sm text-navy-500 font-medium">Click to upload or drag & drop</p>
+          <p class="text-xs text-navy-400 mt-1">JPG, PNG, WebP (max 2MB)</p>
+        </div>
+        <input type="file" id="file-input" accept="image/jpeg,image/png,image/webp" class="hidden">
+
+        <!-- Or URL -->
+        <div class="mt-3 flex items-center gap-2">
+          <span class="text-xs text-navy-400">or paste URL:</span>
+          <input type="url" id="input-image-url" placeholder="https://example.com/image.jpg"
+            class="flex-1 px-3 py-1.5 text-xs border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500/30 focus:border-brand-500 transition">
+          <button type="button" onclick="setImageFromUrl()" class="px-3 py-1.5 text-xs bg-gray-100 text-navy-600 rounded-lg hover:bg-gray-200 transition-colors font-semibold">Use</button>
+        </div>
+        <input type="hidden" id="input-featured-image" value="">
+      </div>
+
+      <!-- Quill Editor -->
+      <div class="bg-white rounded-xl border border-gray-200 p-5">
+        <label class="block text-sm font-semibold text-navy-800 mb-3">Content <span class="text-red-500">*</span></label>
+        <div id="editor"></div>
+        <p class="text-xs text-navy-400 mt-2">Tip: Use the image button in toolbar to insert images into the article body.</p>
+      </div>
+
+      <!-- Excerpt -->
+      <div class="bg-white rounded-xl border border-gray-200 p-5">
+        <div class="flex items-center justify-between mb-2">
+          <label class="text-sm font-semibold text-navy-800">Excerpt</label>
+          <button type="button" onclick="autoGenerateExcerpt()" class="text-xs text-brand-500 hover:text-brand-600 font-semibold">Auto-generate from content</button>
+        </div>
+        <textarea id="input-excerpt" rows="3" placeholder="Brief summary of the article (shown in cards and search results)..."
+          class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500/30 focus:border-brand-500 transition text-sm resize-y"></textarea>
+      </div>
+
+      <!-- SEO -->
+      <details class="bg-white rounded-xl border border-gray-200">
+        <summary class="px-5 py-4 cursor-pointer font-semibold text-sm text-navy-800 hover:text-brand-500 transition-colors flex items-center gap-2">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          SEO Settings (Optional)
+        </summary>
+        <div class="px-5 pb-5 space-y-4 border-t border-gray-100 pt-4">
+          <div>
+            <label class="block text-xs font-semibold text-navy-600 mb-1.5">Meta Title</label>
+            <input type="text" id="input-meta-title" placeholder="Override the default title for search engines (leave blank to use article title)"
+              class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500/30 focus:border-brand-500 transition text-sm">
+            <p class="text-xs text-navy-400 mt-1" id="meta-title-count">0 / 60 characters</p>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-navy-600 mb-1.5">Meta Description</label>
+            <textarea id="input-meta-desc" rows="3" placeholder="Brief description for search engine results (leave blank to use excerpt)"
+              class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500/30 focus:border-brand-500 transition text-sm resize-y"></textarea>
+            <p class="text-xs text-navy-400 mt-1" id="meta-desc-count">0 / 160 characters</p>
+          </div>
+        </div>
+      </details>
+
+      <!-- Bottom Actions -->
+      <div class="flex items-center justify-between pt-2 pb-8">
+        <a href="dashboard.html" class="text-sm text-navy-500 hover:text-navy-700 transition-colors">&larr; Back to Dashboard</a>
+        <div class="flex items-center gap-2">
+          <button type="button" onclick="saveArticle(false)" class="px-5 py-2.5 bg-white border border-gray-300 text-navy-700 text-sm font-semibold rounded-lg hover:bg-gray-50 transition-colors">Save Draft</button>
+          <button type="button" onclick="saveArticle(true)" class="px-5 py-2.5 bg-brand-500 text-white text-sm font-semibold rounded-lg hover:bg-brand-600 transition-colors">Publish</button>
+        </div>
+      </div>
+
+    </form>
+  </main>
+
+  <!-- Quill Editor JS -->
+  <script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
+
+  <script>
+  (function() {
+    'use strict';
+
+    let quill;
+    let editingId = null;
+    let slugManual = false;
+    let currentImagePath = null;
+
+    // Init Quill
+    quill = new Quill('#editor', {
+      modules: {
+        toolbar: {
+          container: [
+            [{ 'header': [1, 2, 3, false] }],
+            ['bold', 'italic', 'underline', 'strike'],
+            [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+            ['blockquote', 'code-block'],
+            ['link', 'image'],
+            ['clean']
+          ],
+          handlers: {
+            image: imageHandler
+          }
+        }
+      },
+      theme: 'snow',
+      placeholder: 'Write your article content here...'
+    });
+
+    // Custom image handler — upload ke Supabase Storage
+    function imageHandler() {
+      const input = document.createElement('input');
+      input.setAttribute('type', 'file');
+      input.setAttribute('accept', 'image/jpeg,image/png,image/webp');
+      input.click();
+
+      input.onchange = async () => {
+        const file = input.files[0];
+        if (!file) return;
+        if (file.size > 2 * 1024 * 1024) { alert('Image must be under 2MB'); return; }
+
+        // Show loading
+        const range = quill.getSelection(true);
+        quill.insertText(range.index, 'Uploading image...', { color: '#9fb3c8' });
+
+        const ext = file.name.split('.').pop();
+        const fileName = `content-${Date.now()}-${Math.random().toString(36).substr(2, 6)}.${ext}`;
+
+        const { data, error } = await supabaseClient.storage
+          .from('article-images')
+          .upload(fileName, file);
+
+        if (error) {
+          quill.deleteText(range.index, 19);
+          alert('Upload failed: ' + error.message);
+          return;
+        }
+
+        const url = supabaseClient.storage.from('article-images').getPublicUrl(data.path).data.publicUrl;
+        quill.deleteText(range.index, 19);
+        quill.insertEmbed(range.index, 'image', url);
+        quill.setSelection(range.index + 1);
+      };
+    }
+
+    // Auto-slug dari title
+    document.getElementById('input-title').addEventListener('input', function() {
+      if (!slugManual) {
+        const slug = this.value.toString().toLowerCase()
+          .replace(/\s+/g, '-').replace(/[^\w\-]+/g, '').replace(/\-\-+/g, '-').replace(/^-+/, '').replace(/-+$/, '');
+        document.getElementById('slug-display').textContent = slug || 'auto-generated-from-title';
+        document.getElementById('input-slug').value = slug;
+      }
+    });
+
+    // Toggle slug edit
+    window.toggleSlugEdit = function() {
+      slugManual = !slugManual;
+      const display = document.getElementById('slug-display');
+      const input = document.getElementById('input-slug');
+      const btn = document.getElementById('slug-edit-btn');
+
+      if (slugManual) {
+        display.classList.add('hidden');
+        input.classList.remove('hidden');
+        input.focus();
+        btn.textContent = 'Auto';
+      } else {
+        display.classList.remove('hidden');
+        input.classList.add('hidden');
+        btn.textContent = 'Edit';
+        // Re-auto from title
+        document.getElementById('input-title').dispatchEvent(new Event('input'));
+      }
+    };
+
+    // SEO char counters
+    document.getElementById('input-meta-title').addEventListener('input', function() {
+      document.getElementById('meta-title-count').textContent = `${this.value.length} / 60 characters`;
+    });
+    document.getElementById('input-meta-desc').addEventListener('input', function() {
+      document.getElementById('meta-desc-count').textContent = `${this.value.length} / 160 characters`;
+    });
+
+    // Featured image: file upload
+    const fileInput = document.getElementById('file-input');
+    const uploadZone = document.getElementById('upload-zone');
+
+    fileInput.addEventListener('change', handleFileUpload);
+
+    uploadZone.addEventListener('dragover', (e) => { e.preventDefault(); uploadZone.classList.add('dragover'); });
+    uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('dragover'));
+    uploadZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      uploadZone.classList.remove('dragover');
+      if (e.dataTransfer.files.length) {
+        fileInput.files = e.dataTransfer.files;
+        handleFileUpload();
+      }
+    });
+
+    async function handleFileUpload() {
+      const file = fileInput.files[0];
+      if (!file) return;
+      if (file.size > 2 * 1024 * 1024) { alert('Image must be under 2MB'); return; }
+
+      uploadZone.innerHTML = '<div class="flex items-center justify-center gap-2 text-sm text-navy-500"><div class="w-4 h-4 border-2 border-brand-500 border-t-transparent rounded-full animate-spin"></div>Uploading...</div>';
+
+      const ext = file.name.split('.').pop();
+      const fileName = `featured-${Date.now()}-${Math.random().toString(36).substr(2, 6)}.${ext}`;
+
+      const { data, error } = await supabaseClient.storage
+        .from('article-images')
+        .upload(fileName, file);
+
+      if (error) {
+        alert('Upload failed: ' + error.message);
+        resetUploadZone();
+        return;
+      }
+
+      const path = data.path;
+      const url = getImageUrl(path);
+      setFeaturedImage(url, path);
+    }
+
+    function setFeaturedImage(url, path) {
+      document.getElementById('image-preview-img').src = url;
+      document.getElementById('image-preview').classList.remove('hidden');
+      document.getElementById('upload-zone').classList.add('hidden');
+      document.getElementById('input-featured-image').value = path || url;
+      currentImagePath = path;
+    }
+
+    function resetUploadZone() {
+      document.getElementById('upload-zone').classList.remove('hidden');
+      document.getElementById('upload-zone').innerHTML = `
+        <svg class="w-10 h-10 mx-auto text-gray-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+        <p class="text-sm text-navy-500 font-medium">Click to upload or drag & drop</p>
+        <p class="text-xs text-navy-400 mt-1">JPG, PNG, WebP (max 2MB)</p>`;
+    }
+
+    window.removeImage = function() {
+      document.getElementById('image-preview').classList.add('hidden');
+      document.getElementById('upload-zone').classList.remove('hidden');
+      document.getElementById('input-featured-image').value = '';
+      document.getElementById('input-image-url').value = '';
+      currentImagePath = null;
+      resetUploadZone();
+      fileInput.value = '';
+    };
+
+    window.setImageFromUrl = function() {
+      const url = document.getElementById('input-image-url').value.trim();
+      if (!url) return;
+      setFeaturedImage(url, url);
+    };
+
+    // Auto-generate excerpt
+    window.autoGenerateExcerpt = function() {
+      const text = quill.getText().trim();
+      if (!text) { showToast('Write some content first', 'info'); return; }
+      const excerpt = text.substring(0, 200).trim();
+      document.getElementById('input-excerpt').value = excerpt + (text.length > 200 ? '...' : '');
+      showToast('Excerpt generated');
+    };
+
+    // Load categories
+    async function loadCategories() {
+      const { data } = await supabaseClient.from('categories').select('*').order('name');
+      if (!data) return;
+      const select = document.getElementById('input-category');
+      select.innerHTML = '<option value="">Select category...</option>' +
+        data.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+    }
+
+    // Load article for editing
+    async function loadArticle(id) {
+      const { data: article, error } = await supabaseClient
+        .from('articles')
+        .select('*, categories(*)')
+        .eq('id', id)
+        .single();
+
+      if (error || !article) {
+        showToast('Article not found', 'error');
+        window.location.href = 'dashboard.html';
+        return;
+      }
+
+      editingId = article.id;
+      document.getElementById('page-title').textContent = 'Edit Article';
+      document.title = 'Edit: ' + article.title + ' — TheEuroBrief Admin';
+
+      document.getElementById('input-title').value = article.title;
+      document.getElementById('input-slug').value = article.slug;
+      document.getElementById('slug-display').textContent = article.slug;
+      document.getElementById('input-category').value = article.category_id || '';
+      document.getElementById('input-featured').checked = article.is_featured;
+      document.getElementById('input-excerpt').value = article.excerpt || '';
+      document.getElementById('input-meta-title').value = article.meta_title || '';
+      document.getElementById('input-meta-desc').value = article.meta_description || '';
+
+      // Trigger counters
+      document.getElementById('input-meta-title').dispatchEvent(new Event('input'));
+      document.getElementById('input-meta-desc').dispatchEvent(new Event('input'));
+
+      // Featured image
+      if (article.featured_image) {
+        const url = getImageUrl(article.featured_image);
+        setFeaturedImage(url, article.featured_image);
+        if (article.featured_image.startsWith('http')) {
+          document.getElementById('input-image-url').value = article.featured_image;
+        }
+      }
+
+      // Content — parse HTML into Quill
+      if (article.content) {
+        quill.root.innerHTML = article.content;
+      }
+    }
+
+    // SAVE ARTICLE
+    window.saveArticle = async function(publish) {
+      const title = document.getElementById('input-title').value.trim();
+      const slug = document.getElementById('input-slug').value.trim();
+      const categoryId = document.getElementById('input-category').value;
+      const content = quill.root.innerHTML;
+      const excerpt = document.getElementById('input-excerpt').value.trim();
+      const metaTitle = document.getElementById('input-meta-title').value.trim();
+      const metaDesc = document.getElementById('input-meta-desc').value.trim();
+      const featuredImage = document.getElementById('input-featured-image').value;
+      const isFeatured = document.getElementById('input-featured').checked;
+
+      // Validation
+      if (!title) { showToast('Title is required', 'error'); document.getElementById('input-title').focus(); return; }
+      if (!slug) { showToast('Slug is required', 'error'); return; }
+      if (!categoryId) { showToast('Please select a category', 'error'); return; }
+      if (!content || content === '<p><br></p>') { showToast('Content is required', 'error'); return; }
+
+      const btnPublish = document.getElementById('btn-publish');
+      const btnDraft = document.getElementById('btn-draft');
+      btnPublish.disabled = true;
+      btnDraft.disabled = true;
+      btnPublish.textContent = publish ? 'Publishing...' : 'Saving...';
+
+      try {
+        // Cek slug unik (kecuali saat edit slug yang sama)
+        if (!editingId) {
+          const finalSlug = await getUniqueSlug(slug);
+          document.getElementById('input-slug').value = finalSlug;
+          document.getElementById('slug-display').textContent = finalSlug;
+          var slugToUse = finalSlug;
+        } else {
+          const { data: existing } = await supabaseClient.from('articles').select('id').eq('slug', slug).neq('id', editingId).maybeSingle();
+          if (existing) { showToast('Slug already exists. Please edit the slug.', 'error'); btnPublish.disabled = false; btnDraft.disabled = false; btnPublish.textContent = 'Publish'; return; }
+          var slugToUse = slug;
+        }
+
+        const articleData = {
+          title,
+          slug: slugToUse,
+          content,
+          excerpt: excerpt || null,
+          featured_image: featuredImage || null,
+          category_id: categoryId,
+          is_featured: isFeatured,
+          meta_title: metaTitle || null,
+          meta_description: metaDesc || null,
+          is_published: publish,
+          published_at: publish ? new Date().toISOString() : null
+        };
+
+        let result;
+        if (editingId) {
+          result = await supabaseClient.from('articles').update(articleData).eq('id', editingId);
+        } else {
+          result = await supabaseClient.from('articles').insert(articleData);
+        }
+
+        if (result.error) {
+          if (result.error.code === '23505') {
+            showToast('Slug already exists. Please change the slug.', 'error');
+          } else {
+            showToast('Error: ' + result.error.message, 'error');
+          }
+          return;
+        }
+
+        showToast(publish ? 'Article published!' : 'Draft saved!');
+        setTimeout(() => { window.location.href = 'dashboard.html'; }, 1000);
+
+      } catch (err) {
+        showToast('Unexpected error: ' + err.message, 'error');
+      } finally {
+        btnPublish.disabled = false;
+        btnDraft.disabled = false;
+        btnPublish.textContent = 'Publish';
+      }
+    };
+
+    // INIT
+    async function init() {
+      const session = await requireAuth();
+      if (!session) return;
+
+      document.getElementById('admin-email').textContent = session.user.email;
+      await loadCategories();
+
+      // Cek apakah mode edit
+      const params = new URLSearchParams(window.location.search);
+      const editId = params.get('id');
+      if (editId) {
+        await loadArticle(editId);
+      }
+    }
+
+    if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', init); } else { init(); }
+  })();
+  </script>
+</body>
+</html>
