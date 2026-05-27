@@ -345,12 +345,19 @@
     }
 
     function setFeaturedImage(url, path) {
-      document.getElementById('image-preview-img').src = url;
-      document.getElementById('image-preview').classList.remove('hidden');
-      document.getElementById('upload-zone').classList.add('hidden');
-      document.getElementById('input-featured-image').value = path || url;
-      currentImagePath = path;
-    }
+  const img = document.getElementById('image-preview-img');
+  img.src = url;
+  img.onerror = function() {
+    console.error('Image failed to load:', url);
+    this.style.display = 'none';
+    alert('Gagal memuat gambar. URL mungkin salah atau gambar tidak dapat diakses.');
+    removeImage();
+  };
+  document.getElementById('image-preview').classList.remove('hidden');
+  document.getElementById('upload-zone').classList.add('hidden');
+  document.getElementById('input-featured-image').value = path || url;
+  currentImagePath = path;
+}
 
     function resetUploadZone() {
       document.getElementById('upload-zone').classList.remove('hidden');
