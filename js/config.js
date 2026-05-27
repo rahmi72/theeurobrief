@@ -2,9 +2,11 @@
 // THEEUROBRIEF — SUPABASE CONFIGURATION
 // ============================================
 
+// GANTI NILAI DI BAWAH INI DENGAN DATA DARI SUPABASE
 const SUPABASE_URL = 'https://krfofwmlkrwozbuqvuur.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtyZm9md21sa3J3b3pidXF2dXVyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk4NjY3MTMsImV4cCI6MjA5NTQ0MjcxM30.EqabN74OniiV9Ousus34KRj5bnMVcLYzmUj5SAPOurE
-';
+const SUPABASE_ANON_KEY = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtyZm9md21sa3J3b3pidXF2dXVyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk4NjY3MTMsImV4cCI6MjA5NTQ0MjcxM30.EqabN74OniiV9Ousus34KRj5bnMVcLYzmUj5SAPOurE`;
+
+// Inisialisasi Supabase client
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // Helper: Ambil URL gambar dari Supabase Storage
