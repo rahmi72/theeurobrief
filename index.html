@@ -327,27 +327,30 @@
 
     // Membuat card artikel untuk grid
     function createArticleCard(article) {
-      const imgUrl = getImageUrl(article.featured_image);
-      const catName = article.categories?.name || 'Uncategorized';
-      const catSlug = article.categories?.slug || 'all';
-      const dateStr = formatDateShort(article.published_at);
+  const imgUrl = getImageUrl(article.featured_image);
+  const catName = article.categories?.name || 'News';
+  const catSlug = article.categories?.slug || 'all';
+  const dateStr = formatDateShort(article.published_at);
 
-      const imageHTML = imgUrl
-        ? `<img src="${imgUrl}" alt="${article.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" onerror="this.parentElement.classList.add('bg-gradient-to-br','from-brand-50','to-brand-100');this.remove();this.parentElement.innerHTML='<div class=\\'w-full h-full flex items-center justify-center\\'><span class=\\'text-brand-200 text-5xl font-display font-black\\'>${catName[0]}</span></div>'">`
-        : `<div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-brand-50 to-brand-100"><span class="text-brand-200 text-5xl font-display font-black">${catName[0]}</span></div>`;
+  // Versi simplified tanpa kompleks onerror
+  const imageHTML = imgUrl
+    ? `<img src="${imgUrl}" alt="${article.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="hidden w-full h-full flex items-center justify-center bg-gradient-to-br from-brand-50 to-brand-100">
+          <span class="text-brand-200 text-4xl font-display font-black">${catName[0]}</span>
+        </div>`
+    : `<div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-brand-50 to-brand-100"><span class="text-brand-200 text-4xl font-display font-black">${catName[0]}</span></div>`;
 
-      return `
-        <a href="article.html?slug=${article.slug}" class="group block bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg border border-gray-100 hover:border-gray-200 transition-all duration-300">
-          <div class="aspect-[16/10] overflow-hidden bg-gray-100">${imageHTML}</div>
-          <div class="p-4">
-            <a href="category.html?slug=${catSlug}" class="text-xs font-bold text-brand-500 uppercase tracking-wider hover:text-brand-700 transition-colors">${catName}</a>
-            <h3 class="mt-1.5 font-display font-bold text-navy-900 group-hover:text-brand-600 transition-colors line-clamp-2 leading-snug">${article.title}</h3>
-            <p class="mt-2 text-sm text-navy-500 line-clamp-2 leading-relaxed">${article.excerpt || ''}</p>
-            <p class="mt-2 text-xs text-navy-400">${dateStr}</p>
-          </div>
-        </a>`;
-    }
-
+  return `
+    <a href="article.html?slug=${article.slug}" class="group block bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg border border-gray-100 hover:border-gray-200 transition-all duration-300">
+      <div class="aspect-[16/10] overflow-hidden bg-gray-100">${imageHTML}</div>
+      <div class="p-4">
+        <a href="category.html?slug=${catSlug}" class="text-xs font-bold text-brand-500 uppercase tracking-wider hover:text-brand-700 transition-colors">${catName}</a>
+        <h3 class="mt-1.5 font-display font-bold text-navy-900 group-hover:text-brand-600 transition-colors line-clamp-2 leading-snug">${article.title}</h3>
+        <p class="mt-2 text-sm text-navy-500 line-clamp-3 leading-relaxed">${article.excerpt || ''}</p>
+        <p class="mt-2 text-xs text-navy-400">${dateStr}</p>
+      </div>
+    </a>`;
+}
     // Membuat hero featured (besar)
     function createHeroFeatured(article) {
       const imgUrl = getImageUrl(article.featured_image);
