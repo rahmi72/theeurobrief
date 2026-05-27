@@ -358,9 +358,11 @@
       const catSlug = article.categories?.slug || 'all';
 
       const imageHTML = imgUrl
-        ? `<img src="${imgUrl}" alt="${article.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" loading="eager">`
-        : `<div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-navy-800 to-navy-900"><span class="text-navy-600 text-8xl font-display font-black">${catName[0]}</span></div>`;
-
+  ? `<img src="${imgUrl}" alt="${article.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" loading="eager" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+      <div class="hidden w-full h-full flex items-center justify-center bg-gradient-to-br from-navy-800 to-navy-900">
+        <span class="text-navy-600 text-8xl font-display font-black">${catName[0]}</span>
+      </div>`
+  : `<div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-navy-800 to-navy-900"><span class="text-navy-600 text-8xl font-display font-black">${catName[0]}</span></div>`;
       return `
         <a href="article.html?slug=${article.slug}" class="group relative block rounded-xl overflow-hidden lg:col-span-2 aspect-[16/9] lg:aspect-auto lg:min-h-[420px]">
           <div class="absolute inset-0">${imageHTML}</div>
@@ -381,8 +383,11 @@
       const catSlug = article.categories?.slug || 'all';
 
       const imageHTML = imgUrl
-        ? `<img src="${imgUrl}" alt="${article.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy">`
-        : `<div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-brand-50 to-brand-100"><span class="text-brand-200 text-4xl font-display font-black">${catName[0]}</span></div>`;
+  ? `<img src="${imgUrl}" alt="${article.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+      <div class="hidden w-full h-full flex items-center justify-center bg-gradient-to-br from-brand-50 to-brand-100">
+        <span class="text-brand-200 text-4xl font-display font-black">${catName[0]}</span>
+      </div>`
+  : `<div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-brand-50 to-brand-100"><span class="text-brand-200 text-4xl font-display font-black">${catName[0]}</span></div>`;
 
       return `
         <a href="article.html?slug=${article.slug}" class="group relative block rounded-xl overflow-hidden flex-1 min-h-[200px]">
