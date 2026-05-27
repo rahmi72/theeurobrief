@@ -1,1 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+  <!-- SEO Meta Tags — akan di-update oleh JavaScript -->
+  <title>Loading... — TheEuroBrief</title>
+  <meta name="description" content="">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="">
+
+  <!-- Open Graph — di-update oleh JavaScript -->
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="">
+  <meta property="og:description" content="">
+  <meta property="og:image" content="">
+  <meta property="og:url" content="">
+  <meta property="og:site_name" content="TheEuroBrief">
+  <meta property="article:published_time" content="">
+  <meta property="article:section" content="">
+  <meta property="article:author" content="TheEuroBrief Staff">
+
+  <!-- Twitter Card — di-update oleh JavaScript -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="">
+  <meta name="twitter:description" content="">
+  <meta name="twitter:image" content="">
+
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='15' fill='%23B91C1C'/><text x='50' y='68' font-family='serif' font-size='55' font-weight='bold' fill='white' text-anchor='middle'>E</text></svg>">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Source+Sans+3:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: { 50:'#fef2f2',100:'#fee2e2',200:'#fecaca',500:'#B91C1C',600:'#991B1B',700:'#7F1D1D',800:'#6B1616',900:'#4C0E0E' },
+            navy: { 50:'#f0f4f8',100:'#d9e2ec',200:'#bcccdc',300:'#9fb3c8',400:'#829ab1',500:'#627d98',600:'#486581',700:'#334e68',800:'#243b53',900:'#102a43' }
+          },
+          fontFamily: {
+            display: ['"Playfair Display"', 'Georgia', 'serif'],
+            body: ['"Source Sans 3"', 'Helvetica', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Supabase JS -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <!-- Config -->
+  <script src="js/config.js"></script>
+
+  <!-- Custom Styles -->
+  <style>
+    body { font-family: 'Source Sans 3', sans-serif; }
+    .font-display { font-family: 'Playfair Display', Georgia, serif; }
+    .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .line-clamp-3 { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+
+    @keyframes shimmer {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+    .skeleton {
+      background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s ease-in-out infinite;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    .nav-link { position: relative; }
+    .nav-link::after {
+      content: ''; position: absolute; bottom: -2px; left: 0; width: 0;
+      height: 2px; background: #B91C1C; transition: width 0.3s ease;
+    }
+    .nav-link:hover::after { width: 100%; }
+
+    /* Artikel body typography */
+    .article-body { font-size: 1.125rem; line-height: 1.85; color: #334e68; }
+    .article-body p { margin-bottom: 1.5em; }
+    .article-body h2 { font-family: 'Playfair Display', Georgia, serif; font-weight: 700; font-size: 1.5rem; color: #102a43; margin: 2em 0 0.75em; line-height: 1.3; }
+    .article-body h3 { font-family: 'Playfair Display', Georgia, serif; font-weight: 700; font-size: 1.25rem; color: #243b53; margin: 1.75em 0 0.6em; }
+    .article-body blockquote {
+      border-left: 4px solid #B91C1C; padding: 1em 1.5em; margin: 1.5em 0;
+      background: #fef2f2; border-radius: 0 8px 8px 0; font-style: italic; color: #486581;
+    }
+    .article-body ul, .article-body ol { margin: 1em 0 1.5em 1.5em; }
+    .article-body li { margin-bottom: 0.5em; }
+    .article-body a { color: #B91C1C; text-decoration: underline; text-underline-offset: 2px; }
+    .article-body a:hover { color: #991B1B; }
+    .article-body img { max-width: 100%; height: auto; border-radius: 8px; margin: 1.5em 0; }
+    .article-body strong { color: #102a43; font-weight: 600; }
+    .article-body em { font-style: italic; }
+    .article-body hr { border: none; border-top: 2px solid #e2e8f0; margin: 2em 0; }
+  </style>
+
+  <!-- Schema placeholder — di-update oleh JavaScript -->
+  <script type="application/ld+json" id="schema-article">{}</script>
+  <script type="application/ld+json" id="schema-breadcrumb">{}</script>
+</head>
+<body class="bg-gray-50 text-navy-900 font-body antialiased">
+
+  <!-- TOP BAR -->
+  <div class="bg-navy-900 text-white text-xs">
+    <div class="max-w-7xl mx-auto px-4 py-2 flex items-center justify-between">
+      <span id="current-date" class="hidden sm:block"></span>
+      <div class="flex items-center gap-4">
+        <a href="about.html" class="hover:text-brand-100 transition-colors">About</a>
+        <a href="search.html" class="hover:text-brand-100 transition-colors">Search</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- HEADER -->
+  <header class="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+      <a href="index.html" class="flex items-center gap-2">
+        <div class="w-10 h-10 bg-brand-500 rounded-lg flex items-center justify-center">
+          <span class="text-white font-display font-black text-xl">E</span>
+        </div>
+        <div>
+          <h1 class="font-display font-black text-2xl md:text-3xl text-navy-900 leading-none tracking-tight">TheEuroBrief</h1>
+          <span class="text-[10px] uppercase tracking-[0.25em] text-navy-500 font-semibold hidden sm:block">Your Window into Europe</span>
+        </div>
+      </a>
+      <div class="hidden md:flex items-center gap-3">
+        <form action="search.html" method="GET" class="relative">
+          <input type="text" name="q" placeholder="Search articles..."
+            class="w-56 lg:w-72 pl-10 pr-4 py-2 text-sm border border-gray-300 rounded-full bg-gray-50 focus:outline-none focus:ring-2 focus:ring-brand-500/30 focus:border-brand-500 transition">
+          <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+        </form>
+      </div>
+      <button id="mobile-menu-btn" class="md:hidden p-2 rounded-lg hover:bg-gray-100 transition" aria-label="Open menu">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </button>
+    </div>
+    <nav class="border-t border-gray-100 bg-gray-50/80 hidden md:block">
+      <div class="max-w-7xl mx-auto px-4">
+        <div id="nav-categories" class="flex items-center gap-1 overflow-x-auto py-0 scrollbar-hide text-sm">
+          <a href="index.html" class="nav-link px-3 py-3 font-medium text-navy-600 hover:text-brand-500 whitespace-nowrap transition-colors">Home</a>
+        </div>
+      </div>
+    </nav>
+    <div id="mobile-menu" class="md:hidden hidden border-t border-gray-100 bg-white">
+      <div class="px-4 py-3">
+        <form action="search.html" method="GET" class="relative mb-3">
+          <input type="text" name="q" placeholder="Search articles..."
+            class="w-full pl-10 pr-4 py-2.5 text-sm border border-gray-300 rounded-lg bg-gray-50 focus:outline-none focus:ring-2 focus:ring-brand-500/30 focus:border-brand-500">
+          <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+        </form>
+        <div id="mobile-nav-categories" class="flex flex-col gap-1">
+          <a href="index.html" class="px-3 py-2 rounded-lg font-medium text-navy-600 hover:bg-gray-100 transition-colors">Home</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN -->
+  <main>
+    <!-- Breadcrumb -->
+    <div class="max-w-4xl mx-auto px-4 pt-5">
+      <nav id="breadcrumb" class="flex items-center gap-2 text-xs text-navy-400">
+        <a href="index.html" class="hover:text-brand-500 transition-colors">Home</a>
+        <span>/</span>
+        <span class="skeleton w-16 h-3 rounded inline-block"></span>
+        <span>/</span>
+        <span class="skeleton w-40 h-3 rounded inline-block"></span>
+      </nav>
+    </div>
+
+    <!-- Article Container -->
+    <article class="max-w-4xl mx-auto px-4 pt-4 pb-12">
+
+      <!-- Skeleton Loading -->
+      <div id="article-skeleton">
+        <div class="skeleton h-5 w-24 rounded mb-4"></div>
+        <div class="skeleton h-12 w-full rounded mb-3"></div>
+        <div class="skeleton h-12 w-3/4 rounded mb-5"></div>
+        <div class="flex items-center gap-4 mb-6">
+          <div class="skeleton w-10 h-10 rounded-full"></div>
+          <div><div class="skeleton h-4 w-32 rounded mb-1"></div><div class="skeleton h-3 w-20 rounded"></div></div>
+        </div>
+        <div class="skeleton rounded-xl aspect-[16/9] mb-8"></div>
+        <div class="space-y-4">
+          <div class="skeleton h-4 w-full rounded"></div>
+          <div class="skeleton h-4 w-full rounded"></div>
+          <div class="skeleton h-4 w-5/6 rounded"></div>
+          <div class="skeleton h-4 w-full rounded"></div>
+          <div class="skeleton h-4 w-4/5 rounded"></div>
+          <div class="skeleton h-4 w-full rounded"></div>
+          <div class="skeleton h-4 w-3/4 rounded"></div>
+        </div>
+      </div>
+
+      <!-- Article Content — diisi oleh JavaScript -->
+      <div id="article-content" class="hidden"></div>
+
+    </article>
+
+    <!-- Related Articles -->
+    <section class="max-w-4xl mx-auto px-4 pb-12">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="w-1 h-7 bg-brand-500 rounded-full"></div>
+        <h2 class="font-display font-bold text-2xl text-navy-900">Related Articles</h2>
+      </div>
+      <div id="related-grid" class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+        <div class="skeleton rounded-xl aspect-[16/10]"></div>
+        <div class="skeleton rounded-xl aspect-[16/10]"></div>
+        <div class="skeleton rounded-xl aspect-[16/10]"></div>
+      </div>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="bg-navy-900 text-white">
+    <div class="max-w-7xl mx-auto px-4 py-12">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div>
+          <div class="flex items-center gap-2 mb-4">
+            <div class="w-9 h-9 bg-brand-500 rounded-lg flex items-center justify-center">
+              <span class="text-white font-display font-black text-lg">E</span>
+            </div>
+            <span class="font-display font-bold text-xl">TheEuroBrief</span>
+          </div>
+          <p class="text-navy-300 text-sm leading-relaxed">Your trusted source for European news. We cover politics, business, technology, culture, and everything that shapes the European continent.</p>
+        </div>
+        <div>
+          <h4 class="font-semibold text-sm uppercase tracking-wider text-navy-300 mb-4">Categories</h4>
+          <div id="footer-categories" class="grid grid-cols-2 gap-2 text-sm"></div>
+        </div>
+        <div>
+          <h4 class="font-semibold text-sm uppercase tracking-wider text-navy-300 mb-4">Company</h4>
+          <div class="flex flex-col gap-2 text-sm">
+            <a href="about.html" class="text-navy-200 hover:text-white transition-colors">About Us</a>
+            <a href="about.html#contact" class="text-navy-200 hover:text-white transition-colors">Contact</a>
+            <a href="about.html#privacy" class="text-navy-200 hover:text-white transition-colors">Privacy Policy</a>
+            <a href="about.html#terms" class="text-navy-200 hover:text-white transition-colors">Terms of Service</a>
+          </div>
+        </div>
+      </div>
+      <div class="border-t border-navy-700 mt-10 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-navy-400">
+        <span>&copy; <span id="footer-year"></span> TheEuroBrief. All rights reserved.</span>
+        <span>Made with focus on European journalism.</span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+  (function() {
+    'use strict';
+
+    const dateEl = document.getElementById('current-date');
+    if (dateEl) dateEl.textContent = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    document.getElementById('footer-year').textContent = new Date().getFullYear();
+
+    // Mobile menu
+    const menuBtn = document.getElementById('mobile-menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    if (menuBtn && mobileMenu) menuBtn.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
+
+    // Ambil slug dari URL
+    const params = new URLSearchParams(window.location.search);
+    const slug = params.get('slug');
+
+    if (!slug) {
+      window.location.href = 'index.html';
+      return;
+    }
+
+    // --- Load Nav Categories ---
+    async function loadNavCategories() {
+      const { data } = await supabaseClient.from('categories').select('*').order('name');
+      if (!data) return;
+
+      const navContainer = document.getElementById('nav-categories');
+      const mobileNavContainer = document.getElementById('mobile-nav-categories');
+      const footerContainer = document.getElementById('footer-categories');
+
+      if (navContainer) {
+        navContainer.innerHTML = `<a href="index.html" class="nav-link px-3 py-3 font-medium text-navy-600 hover:text-brand-500 whitespace-nowrap transition-colors">Home</a>` +
+          data.map(c => `<a href="category.html?slug=${c.slug}" class="nav-link px-3 py-3 text-navy-600 hover:text-brand-500 font-medium whitespace-nowrap transition-colors">${c.name}</a>`).join('');
+      }
+      if (mobileNavContainer) {
+        mobileNavContainer.innerHTML = `<a href="index.html" class="px-3 py-2 rounded-lg font-medium text-navy-600 hover:bg-gray-100 transition-colors">Home</a>` +
+          data.map(c => `<a href="category.html?slug=${c.slug}" class="px-3 py-2 rounded-lg text-navy-600 hover:bg-gray-100 font-medium transition-colors">${c.name}</a>`).join('');
+      }
+      if (footerContainer) {
+        footerContainer.innerHTML = data.map(c => `<a href="category.html?slug=${c.slug}" class="text-navy-200 hover:text-white transition-colors">${c.name}</a>`).join('');
+      }
+    }
+
+    // --- Update SEO Meta Tags ---
+    function updateMetaTags(article) {
+      const imgUrl = getImageUrl(article.featured_image) || '';
+      const catName = article.categories?.name || 'News';
+      const fullTitle = `${article.title} — TheEuroBrief`;
+      const desc = article.meta_description || article.excerpt || article.title;
+      const url = `https://theeurobrief.vercel.app/article.html?slug=${article.slug}`;
+
+      document.title = fullTitle;
+      document.querySelector('meta[name="description"]').setAttribute('content', desc);
+      document.querySelector('link[rel="canonical"]').setAttribute('href', url);
+
+      // Open Graph
+      document.querySelector('meta[property="og:title"]').setAttribute('content', fullTitle);
+      document.querySelector('meta[property="og:description"]').setAttribute('content', desc);
+      document.querySelector('meta[property="og:image"]').setAttribute('content', imgUrl);
+      document.querySelector('meta[property="og:url"]').setAttribute('content', url);
+      document.querySelector('meta[property="article:published_time"]').setAttribute('content', article.published_at);
+      document.querySelector('meta[property="article:section"]').setAttribute('content', catName);
+
+      // Twitter
+      document.querySelector('meta[name="twitter:title"]').setAttribute('content', fullTitle);
+      document.querySelector('meta[name="twitter:description"]').setAttribute('content', desc);
+      document.querySelector('meta[name="twitter:image"]').setAttribute('content', imgUrl);
+
+      // Schema: NewsArticle
+      const schemaArticle = {
+        "@context": "https://schema.org",
+        "@type": "NewsArticle",
+        "headline": article.title,
+        "description": desc,
+        "image": imgUrl,
+        "datePublished": article.published_at,
+        "dateModified": article.updated_at,
+        "author": { "@type": "Organization", "name": article.author_name || "TheEuroBrief Staff" },
+        "publisher": { "@type": "Organization", "name": "TheEuroBrief", "logo": { "@type": "ImageObject", "url": "https://theeurobrief.vercel.app/logo.png" } },
+        "mainEntityOfPage": url
+      };
+      document.getElementById('schema-article').textContent = JSON.stringify(schemaArticle);
+
+      // Schema: BreadcrumbList
+      const schemaBreadcrumb = {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://theeurobrief.vercel.app/" },
+          { "@type": "ListItem", "position": 2, "name": catName, "item": `https://theeurobrief.vercel.app/category.html?slug=${article.categories?.slug || 'all'}` },
+          { "@type": "ListItem", "position": 3, "name": article.title }
+        ]
+      };
+      document.getElementById('schema-breadcrumb').textContent = JSON.stringify(schemaBreadcrumb);
+    }
+
+    // --- Update Breadcrumb ---
+    function updateBreadcrumb(article) {
+      const catName = article.categories?.name || 'News';
+      const catSlug = article.categories?.slug || 'all';
+      document.getElementById('breadcrumb').innerHTML = `
+        <a href="index.html" class="hover:text-brand-500 transition-colors">Home</a>
+        <span class="text-navy-300">/</span>
+        <a href="category.html?slug=${catSlug}" class="hover:text-brand-500 transition-colors">${catName}</a>
+        <span class="text-navy-300">/</span>
+        <span class="text-navy-700 font-medium line-clamp-1">${article.title}</span>`;
+    }
+
+    // --- Render Article ---
+    function renderArticle(article) {
+      const imgUrl = getImageUrl(article.featured_image);
+      const catName = article.categories?.name || 'Uncategorized';
+      const catSlug = article.categories?.slug || 'all';
+
+      const imageHTML = imgUrl
+        ? `<img src="${imgUrl}" alt="${article.title}" class="w-full rounded-xl shadow-lg" onerror="this.parentElement.remove()">`
+        : '';
+
+      const container = document.getElementById('article-content');
+      container.innerHTML = `
+        <a href="category.html?slug=${catSlug}" class="inline-block px-3 py-1 bg-brand-50 text-brand-500 text-xs font-bold uppercase tracking-wider rounded hover:bg-brand-100 transition-colors mb-5">${catName}</a>
+
+        <h1 class="font-display font-black text-3xl sm:text-4xl lg:text-5xl text-navy-900 leading-tight mb-4">${article.title}</h1>
+
+        <div class="flex flex-wrap items-center gap-4 text-sm text-navy-500 mb-8 pb-8 border-b border-gray-200">
+          <div class="flex items-center gap-2">
+            <div class="w-9 h-9 bg-brand-500 rounded-full flex items-center justify-center">
+              <span class="text-white text-xs font-bold">${(article.author_name || 'T')[0].toUpperCase()}</span>
+            </div>
+            <div>
+              <p class="font-semibold text-navy-800">${article.author_name || 'TheEuroBrief Staff'}</p>
+            </div>
+          </div>
+          <span class="text-navy-300">|</span>
+          <time datetime="${article.published_at}">${formatDate(article.published_at)}</time>
+          ${article.updated_at !== article.published_at ? `<span class="text-navy-300">|</span><span class="text-xs text-navy-400">Updated ${formatDate(article.updated_at)}</span>` : ''}
+        </div>
+
+        ${imageHTML ? `<figure class="mb-8">${imageHTML}</figure>` : ''}
+
+        <div class="article-body">${article.content}</div>
+
+        <div class="mt-10 pt-6 border-t border-gray-200 flex flex-wrap items-center gap-3">
+          <span class="text-xs text-navy-400 uppercase tracking-wider font-semibold">Share:</span>
+          <a href="https://twitter.com/intent/tweet?text=${encodeURIComponent(article.title)}&url=${encodeURIComponent(window.location.href)}" target="_blank" rel="noopener" class="w-9 h-9 rounded-full bg-navy-100 hover:bg-navy-900 hover:text-white text-navy-600 flex items-center justify-center transition-colors" aria-label="Share on Twitter">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+          </a>
+          <a href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}" target="_blank" rel="noopener" class="w-9 h-9 rounded-full bg-navy-100 hover:bg-blue-600 hover:text-white text-navy-600 flex items-center justify-center transition-colors" aria-label="Share on Facebook">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+          </a>
+          <a href="https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(window.location.href)}&title=${encodeURIComponent(article.title)}" target="_blank" rel="noopener" class="w-9 h-9 rounded-full bg-navy-100 hover:bg-blue-700 hover:text-white text-navy-600 flex items-center justify-center transition-colors" aria-label="Share on LinkedIn">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+          </a>
+          <a href="https://wa.me/?text=${encodeURIComponent(article.title + ' ' + window.location.href)}" target="_blank" rel="noopener" class="w-9 h-9 rounded-full bg-navy-100 hover:bg-green-600 hover:text-white text-navy-600 flex items-center justify-center transition-colors" aria-label="Share on WhatsApp">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          </a>
+        </div>
+      `;
+
+      document.getElementById('article-skeleton').classList.add('hidden');
+      container.classList.remove('hidden');
+    }
+
+    // --- Load Related Articles ---
+    async function loadRelated(article) {
+      const container = document.getElementById('related-grid');
+      let query = supabaseClient
+        .from('articles')
+        .select('*, categories(*)')
+        .eq('is_published', true)
+        .neq('id', article.id)
+        .order('published_at', { ascending: false })
+        .limit(3);
+
+      if (article.category_id) {
+        query = supabaseClient
+          .from('articles')
+          .select('*, categories(*)')
+          .eq('is_published', true)
+          .eq('category_id', article.category_id)
+          .neq('id', article.id)
+          .order('published_at', { ascending: false })
+          .limit(3);
+      }
+
+      const { data } = await query;
+
+      if (!data || data.length === 0) {
+        container.innerHTML = '<p class="col-span-full text-center text-navy-400 py-8">No related articles found.</p>';
+        return;
+      }
+
+      container.innerHTML = data.map(a => {
+        const imgUrl = getImageUrl(a.featured_image);
+        const catName = a.categories?.name || 'News';
+        const catSlug = a.categories?.slug || 'all';
+        const imageHTML = imgUrl
+          ? `<img src="${imgUrl}" alt="${a.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy">`
+          : `<div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-brand-50 to-brand-100"><span class="text-brand-200 text-4xl font-display font-black">${catName[0]}</span></div>`;
+        return `
+          <a href="article.html?slug=${a.slug}" class="group block bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg border border-gray-100 transition-all duration-300">
+            <div class="aspect-[16/10] overflow-hidden bg-gray-100">${imageHTML}</div>
+            <div class="p-4">
+              <span class="text-xs font-bold text-brand-500 uppercase tracking-wider">${catName}</span>
+              <h3 class="mt-1 font-display font-bold text-navy-900 group-hover:text-brand-600 transition-colors line-clamp-2 leading-snug">${a.title}</h3>
+              <p class="mt-1.5 text-xs text-navy-400">${formatDateShort(a.published_at)}</p>
+            </div>
+          </a>`;
+      }).join('');
+    }
+
+    // --- Increment Views ---
+    async function incrementViews(articleId) {
+      await supabaseClient.rpc('', {}).catch(() => {});
+      // Fallback: langsung update
+      const { data: current } = await supabaseClient
+        .from('articles')
+        .select('views')
+        .eq('id', articleId)
+        .single();
+      if (current) {
+        await supabaseClient
+          .from('articles')
+          .update({ views: (current.views || 0) + 1 })
+          .eq('id', articleId);
+      }
+    }
+
+    // --- Init ---
+    async function init() {
+      try {
+        const { data: article, error } = await supabaseClient
+          .from('articles')
+          .select('*, categories(*)')
+          .eq('slug', slug)
+          .eq('is_published', true)
+          .single();
+
+        if (error || !article) {
+          document.getElementById('article-skeleton').innerHTML = `
+            <div class="text-center py-20">
+              <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-10 h-10 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              </div>
+              <h2 class="font-display font-bold text-2xl text-navy-900 mb-2">Article Not Found</h2>
+              <p class="text-navy-400 mb-6">The article you're looking for doesn't exist or has been removed.</p>
+              <a href="index.html" class="inline-block px-6 py-2.5 bg-brand-500 text-white text-sm font-semibold rounded-lg hover:bg-brand-600 transition-colors">&larr; Back to Home</a>
+            </div>`;
+          return;
+        }
+
+        updateMetaTags(article);
+        updateBreadcrumb(article);
+        renderArticle(article);
+        incrementViews(article.id);
+        loadRelated(article);
+        loadNavCategories();
+      } catch (err) {
+        console.error('Error loading article:', err);
+      }
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
+
+  })();
+  </script>
+
+</body>
+</html>
