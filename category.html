@@ -237,12 +237,17 @@
     }
 
     function createCard(a) {
-      const imgUrl = getImageUrl(a.featured_image);
-      const catName = a.categories?.name || 'News';
-      const catSlug = a.categories?.slug || 'all';
-      const imageHTML = imgUrl
-        ? `<img src="${imgUrl}" alt="${a.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" onerror="this.parentElement.classList.add('bg-gradient-to-br','from-brand-50','to-brand-100');this.remove();this.parentElement.innerHTML='<div class=\\'w-full h-full flex items-center justify-center\\'><span class=\\'text-brand-200 text-4xl font-display font-black\\'>${catName[0]}</span></div>'">`
-        : `<div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-brand-50 to-brand-100"><span class="text-brand-200 text-4xl font-display font-black">${catName[0]}</span></div>`;
+  const imgUrl = getImageUrl(a.featured_image);
+  const catName = a.categories?.name || 'News';
+  const catSlug = a.categories?.slug || 'all';
+
+  // Simplified onerror
+  const imageHTML = imgUrl
+    ? `<img src="${imgUrl}" alt="${a.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="hidden w-full h-full flex items-center justify-center bg-gradient-to-br from-brand-50 to-brand-100">
+          <span class="text-brand-200 text-4xl font-display font-black">${catName[0]}</span>
+        </div>`
+    : `<div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-brand-50 to-brand-100"><span class="text-brand-200 text-4xl font-display font-black">${catName[0]}</span></div>`;
       return `
         <a href="article.html?slug=${a.slug}" class="group block bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg border border-gray-100 hover:border-gray-200 transition-all duration-300">
           <div class="aspect-[16/10] overflow-hidden bg-gray-100">${imageHTML}</div>
