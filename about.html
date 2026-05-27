@@ -1,1 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About — TheEuroBrief</title>
+  <meta name="description" content="Learn about TheEuroBrief — your trusted source for European news covering politics, business, technology, culture, and more.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://theeurobrief.vercel.app/about.html">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="About — TheEuroBrief">
+  <meta property="og:description" content="Learn about TheEuroBrief — your trusted source for European news.">
+  <meta property="og:url" content="https://theeurobrief.vercel.app/about.html">
+  <meta property="og:site_name" content="TheEuroBrief">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='15' fill='%23B91C1C'/><text x='50' y='68' font-family='serif' font-size='55' font-weight='bold' fill='white' text-anchor='middle'>E</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Source+Sans+3:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: { extend: { colors: { brand: { 50:'#fef2f2',100:'#fee2e2',200:'#fecaca',500:'#B91C1C',600:'#991B1B',700:'#7F1D1D' }, navy: { 50:'#f0f4f8',100:'#d9e2ec',200:'#bcccdc',300:'#9fb3c8',400:'#829ab1',500:'#627d98',600:'#486581',700:'#334e68',800:'#243b53',900:'#102a43' } }, fontFamily: { display: ['"Playfair Display"','Georgia','serif'], body: ['"Source Sans 3"','Helvetica','sans-serif'] } } }
+    }
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+  <style>
+    body { font-family: 'Source Sans 3', sans-serif; }
+    .font-display { font-family: 'Playfair Display', Georgia, serif; }
+    .nav-link { position: relative; }
+    .nav-link::after { content: ''; position: absolute; bottom: -2px; left: 0; width: 0; height: 2px; background: #B91C1C; transition: width 0.3s ease; }
+    .nav-link:hover::after { width: 100%; }
+  </style>
+</head>
+<body class="bg-gray-50 text-navy-900 font-body antialiased">
 
+  <!-- TOP BAR -->
+  <div class="bg-navy-900 text-white text-xs">
+    <div class="max-w-7xl mx-auto px-4 py-2 flex items-center justify-between">
+      <span id="current-date" class="hidden sm:block"></span>
+      <div class="flex items-center gap-4">
+        <a href="about.html" class="text-brand-100">About</a>
+        <a href="search.html" class="hover:text-brand-100 transition-colors">Search</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- HEADER -->
+  <header class="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+      <a href="index.html" class="flex items-center gap-2">
+        <div class="w-10 h-10 bg-brand-500 rounded-lg flex items-center justify-center"><span class="text-white font-display font-black text-xl">E</span></div>
+        <div>
+          <h1 class="font-display font-black text-2xl md:text-3xl text-navy-900 leading-none tracking-tight">TheEuroBrief</h1>
+          <span class="text-[10px] uppercase tracking-[0.25em] text-navy-500 font-semibold hidden sm:block">Your Window into Europe</span>
+        </div>
+      </a>
+      <div class="hidden md:flex items-center gap-3">
+        <form action="search.html" method="GET" class="relative">
+          <input type="text" name="q" placeholder="Search articles..." class="w-56 lg:w-72 pl-10 pr-4 py-2 text-sm border border-gray-300 rounded-full bg-gray-50 focus:outline-none focus:ring-2 focus:ring-brand-500/30 focus:border-brand-500 transition">
+          <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+        </form>
+      </div>
+      <button id="mobile-menu-btn" class="md:hidden p-2 rounded-lg hover:bg-gray-100 transition"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+    </div>
+    <nav class="border-t border-gray-100 bg-gray-50/80 hidden md:block">
+      <div class="max-w-7xl mx-auto px-4">
+        <div id="nav-categories" class="flex items-center gap-1 overflow-x-auto py-0 scrollbar-hide text-sm">
+          <a href="index.html" class="nav-link px-3 py-3 font-medium text-navy-600 hover:text-brand-500 whitespace-nowrap transition-colors">Home</a>
+        </div>
+      </div>
+    </nav>
+    <div id="mobile-menu" class="md:hidden hidden border-t border-gray-100 bg-white">
+      <div class="px-4 py-3"><div id="mobile-nav-categories" class="flex flex-col gap-1"><a href="index.html" class="px-3 py-2 rounded-lg font-medium text-navy-600 hover:bg-gray-100">Home</a></div></div>
+    </div>
+  </header>
+
+  <!-- MAIN -->
+  <main class="max-w-4xl mx-auto px-4 py-10">
+    <nav class="flex items-center gap-2 text-xs text-navy-400 mb-6">
+      <a href="index.html" class="hover:text-brand-500 transition-colors">Home</a><span class="text-navy-300">/</span><span class="text-navy-700 font-medium">About</span>
+    </nav>
+
+    <div class="bg-white rounded-xl border border-gray-200 p-8 md:p-12">
+      <div class="flex items-center gap-4 mb-8">
+        <div class="w-16 h-16 bg-brand-500 rounded-xl flex items-center justify-center flex-shrink-0">
+          <span class="text-white font-display font-black text-3xl">E</span>
+        </div>
+        <div>
+          <h1 class="font-display font-black text-3xl md:text-4xl text-navy-900">TheEuroBrief</h1>
+          <p class="text-brand-500 font-semibold">Your Window into Europe</p>
+        </div>
+      </div>
+
+      <div class="prose prose-lg max-w-none text-navy-700 leading-relaxed space-y-5">
+        <p>TheEuroBrief is an independent digital news platform dedicated to delivering clear, concise, and timely coverage of the most important stories across Europe.</p>
+
+        <h2 class="font-display font-bold text-xl text-navy-900 pt-4">Our Mission</h2>
+        <p>In an era of information overload, we believe readers need a reliable source that cuts through the noise. Our mission is to provide well-structured, fact-based reporting on European politics, business, technology, culture, sports, and environmental affairs.</p>
+
+        <h2 class="font-display font-bold text-xl text-navy-900 pt-4">What We Cover</h2>
+        <ul class="list-disc pl-6 space-y-2">
+          <li><strong>Politics</strong> — European Union developments, national elections, policy changes, and diplomatic relations</li>
+          <li><strong>Business</strong> — Markets, economy, startups, trade agreements, and financial analysis</li>
+          <li><strong>Technology</strong> — Innovation, digital regulation, AI policy, and Europe's tech ecosystem</li>
+          <li><strong>Culture</strong> — Arts, entertainment, lifestyle, and cultural events across the continent</li>
+          <li><strong>Sports</strong> — Football, tennis, cycling, and major European sporting events</li>
+          <li><strong>Environment</strong> — Climate policy, sustainability initiatives, and green energy transition</li>
+          <li><strong>Travel</strong> — Destinations, tourism trends, and travel guides</li>
+          <li><strong>Opinion</strong> — Expert analysis and editorial perspectives on European affairs</li>
+        </ul>
+
+        <h2 class="font-display font-bold text-xl text-navy-900 pt-4">Our Standards</h2>
+        <p>Every article published on TheEuroBrief adheres to strict editorial standards. We prioritize accuracy, fairness, and transparency. When we report, we verify. When we opinionate, we label it clearly.</p>
+      </div>
+
+      <!-- Contact Section -->
+      <div id="contact" class="mt-12 pt-8 border-t border-gray-200">
+        <h2 class="font-display font-bold text-2xl text-navy-900 mb-4">Contact Us</h2>
+        <p class="text-navy-500 mb-6">Have a tip, feedback, or question? Reach out to us below.</p>
+        <form action="https://formspree.io/f/YOUR_FORM_ID" method="POST" class="space-y-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-semibold text-navy-700 mb-1">Name</label>
+              <input type="text" name="name" required class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500/30 focus:border-brand-500 transition">
+            </div>
+            <div>
+              <label class="block text-sm font-semibold text-navy-700 mb-1">Email</label>
+              <input type="email" name="email" required class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500/30 focus:border-brand-500 transition">
+            </div>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-navy-700 mb-1">Subject</label>
+            <input type="text" name="subject" required class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500/30 focus:border-brand-500 transition">
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-navy-700 mb-1">Message</label>
+            <textarea name="message" rows="5" required class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500/30 focus:border-brand-500 transition resize-y"></textarea>
+          </div>
+          <button type="submit" class="px-6 py-2.5 bg-brand-500 text-white font-semibold rounded-lg hover:bg-brand-600 transition-colors">Send Message</button>
+        </form>
+      </div>
+
+      <!-- Privacy Policy -->
+      <div id="privacy" class="mt-12 pt-8 border-t border-gray-200">
+        <h2 class="font-display font-bold text-2xl text-navy-900 mb-4">Privacy Policy</h2>
+        <div class="text-navy-600 leading-relaxed space-y-3 text-sm">
+          <p>TheEuroBrief respects your privacy. We do not collect personal data beyond what is necessary to provide our services. We do not sell, share, or trade your information with third parties.</p>
+          <p>We use cookies only for essential website functionality and analytics (if you consent). You can control cookie preferences through your browser settings.</p>
+          <p>For any privacy-related inquiries, contact us through the form above.</p>
+        </div>
+      </div>
+
+      <!-- Terms of Service -->
+      <div id="terms" class="mt-12 pt-8 border-t border-gray-200">
+        <h2 class="font-display font-bold text-2xl text-navy-900 mb-4">Terms of Service</h2>
+        <div class="text-navy-600 leading-relaxed space-y-3 text-sm">
+          <p>All content published on TheEuroBrief is the intellectual property of TheEuroBrief unless otherwise stated. You may not reproduce, distribute, or republish content without written permission.</p>
+          <p>Opinions expressed in opinion pieces are those of the authors and do not necessarily reflect the views of TheEuroBrief as an organization.</p>
+          <p>We reserve the right to modify these terms at any time. Continued use of the website constitutes acceptance of updated terms.</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="bg-navy-900 text-white">
+    <div class="max-w-7xl mx-auto px-4 py-8 text-center text-xs text-navy-400">
+      <span>&copy; <span id="footer-year"></span> TheEuroBrief. All rights reserved.</span>
+    </div>
+  </footer>
+
+  <script>
+  (function() {
+    'use strict';
+    document.getElementById('current-date').textContent = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    document.getElementById('footer-year').textContent = new Date().getFullYear();
+    const menuBtn = document.getElementById('mobile-menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    if (menuBtn && mobileMenu) menuBtn.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
+
+    async function loadNav() {
+      const { data } = await supabaseClient.from('categories').select('*').order('name');
+      if (!data) return;
+      document.getElementById('nav-categories').innerHTML = `<a href="index.html" class="nav-link px-3 py-3 font-medium text-navy-600 hover:text-brand-500 whitespace-nowrap transition-colors">Home</a>` + data.map(c => `<a href="category.html?slug=${c.slug}" class="nav-link px-3 py-3 text-navy-600 hover:text-brand-500 font-medium whitespace-nowrap transition-colors">${c.name}</a>`).join('');
+      document.getElementById('mobile-nav-categories').innerHTML = `<a href="index.html" class="px-3 py-2 rounded-lg font-medium text-navy-600 hover:bg-gray-100">Home</a>` + data.map(c => `<a href="category.html?slug=${c.slug}" class="px-3 py-2 rounded-lg font-medium text-navy-600 hover:bg-gray-100">${c.name}</a>`).join('');
+    }
+    loadNav();
+  })();
+  </script>
+</body>
+</html>
