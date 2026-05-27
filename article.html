@@ -470,20 +470,22 @@
 
     // --- Increment Views ---
     async function incrementViews(articleId) {
-      await supabaseClient.rpc('', {}).catch(() => {});
-      // Fallback: langsung update
-      const { data: current } = await supabaseClient
+  try {
+    const { data: current } = await supabaseClient
+      .from('articles')
+      .select('views')
+      .eq('id', articleId)
+      .single();
+    if (current) {
+      await supabaseClient
         .from('articles')
-        .select('views')
-        .eq('id', articleId)
-        .single();
-      if (current) {
-        await supabaseClient
-          .from('articles')
-          .update({ views: (current.views || 0) + 1 })
-          .eq('id', articleId);
-      }
+        .update({ views: (current.views || 0) + 1 })
+        .eq('id', articleId);
     }
+  } catch (err) {
+    console.error('Error incrementing views:', err);
+  }
+}
 
     // --- Init ---
     async function init() {
